@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { ESLint } from "eslint";
-import prettierPolicy from "../index.mjs";
+import playwrightPolicy from "../index.mjs";
 
 async function lintText(config, code) {
   const eslint = new ESLint({
@@ -24,7 +24,7 @@ function singleRuleConfig(ruleName) {
         sourceType: "module",
       },
       plugins: {
-        "playwright-policy": prettierPolicy,
+        "playwright-policy": playwrightPolicy,
       },
       rules: {
         [`playwright-policy/${ruleName}`]: "error",
@@ -34,12 +34,10 @@ function singleRuleConfig(ruleName) {
 }
 
 test("root package import resolves and exposes flat config", async () => {
-  const mod = await import("index.mjs");
+  const mod = await import("eslint-plugin-playwright-policy");
 
-  assert.ok(mod.eslintPluginPrettierPolicy);
-  assert.ok(
-    Array.isArray(mod.eslintPluginPrettierPolicy.configs["flat/recommended"]),
-  );
+  assert.ok(mod.default);
+  assert.ok(Array.isArray(mod.default.configs["flat/recommended"]));
 });
 
 test("flat/recommended can be consumed and reports namespaced rule IDs", async () => {
@@ -51,7 +49,7 @@ test("flat/recommended can be consumed and reports namespaced rule IDs", async (
           sourceType: "module",
         },
       },
-      ...prettierPolicy.configs["flat/recommended"],
+      ...playwrightPolicy.configs["flat/recommended"],
     ],
     "page.locator('#login-button')",
   );

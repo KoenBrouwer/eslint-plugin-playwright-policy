@@ -9,6 +9,7 @@
   "files": [
     "index.mjs",
     "rules/",
+    "docs/",
     "README.md",
     "LICENSE"
   ],
@@ -36,11 +37,10 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
     "globals": "^17.3.0",
-    "typescript-eslint": "^8.54.0",
-    "eslint-plugin-playwright-policy": "link:"
+    "typescript-eslint": "^8.54.0"
   },
   "scripts": {
-    "lint": "eslint",
+    "lint": "eslint eslint.config.js index.mjs rules tests",
     "test": "node --test"
   }
 }
