@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-playwright-policy",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A custom ESLint plugin for enforcing Playwright testing policies.",
   "type": "module",
   "exports": {
@@ -24,6 +24,11 @@
     "email": "hi@koenbrouwer.com",
     "url": "https://github.com/koenbrouwer/"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KoenBrouwer/eslint-plugin-playwright-policy.git"
+  },
+  "homepage": "https://github.com/KoenBrouwer/eslint-plugin-playwright-policy/tree/master/docs",
   "license": "MIT",
   "engines": {
     "node": ">=20.19"
