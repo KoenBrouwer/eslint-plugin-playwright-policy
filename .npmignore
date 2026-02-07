@@ -1,0 +1,39 @@
+# Local/editor
+.DS_Store
+.idea/
+.vscode/
+
+# Dependencies and caches
+node_modules/
+.npm/
+.eslintcache
+
+# Project-only config and examples
+eslint.config.js
+examples.spec.js
+tests/
+pnpm-lock.yaml
+
+# VCS and metadata
+.git/
+.gitignore
+
+# Logs and coverage
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+coverage/
+.nyc_output/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Keep package artifacts explicit
+!index.mjs
+!rules/
+!README.md
+!LICENSE
+!package.json

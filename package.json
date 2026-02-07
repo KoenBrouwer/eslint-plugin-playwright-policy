@@ -1,0 +1,46 @@
+{
+  "name": "eslint-plugin-playwright-policy",
+  "version": "1.0.0",
+  "description": "A custom ESLint plugin for enforcing Playwright testing policies.",
+  "type": "module",
+  "exports": {
+    ".": "./index.mjs"
+  },
+  "files": [
+    "index.mjs",
+    "rules/",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "eslint",
+    "eslintplugin",
+    "eslint-plugin",
+    "playwright"
+  ],
+  "author": {
+    "name": "Koen Brouwer",
+    "email": "hi@koenbrouwer.com",
+    "url": "https://github.com/koenbrouwer/"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.19"
+  },
+  "peerDependencies": {
+    "eslint": "^9.0.0 || ^10.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.0.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.5",
+    "globals": "^17.3.0",
+    "typescript-eslint": "^8.54.0",
+    "eslint-plugin-playwright-policy": "link:"
+  },
+  "scripts": {
+    "lint": "eslint",
+    "test": "node --test"
+  }
+}
