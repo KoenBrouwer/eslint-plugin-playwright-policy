@@ -25,9 +25,9 @@ export default [
 
 ## Included Rules
 
-- `playwright-policy/no-class-attribute-selector`
-- `playwright-policy/no-class-dot-selector`
-- `playwright-policy/no-class-selector-variable-flow`
-- `playwright-policy/no-data-test-id-selector`
-- `playwright-policy/no-id-selector`
-- `playwright-policy/no-template-class-selector`
+- [`playwright-policy/no-class-attribute-selector`](docs/no-class-attribute-selector.md)
+- [`playwright-policy/no-class-dot-selector`](docs/no-class-dot-selector.md)
+- [`playwright-policy/no-class-selector-variable-flow`](docs/no-class-selector-variable-flow.md)
+- [`playwright-policy/no-data-test-id-selector`](docs/no-data-test-id-selector.md)
+- [`playwright-policy/no-id-selector`](docs/no-id-selector.md)
+- [`playwright-policy/no-template-class-selector`](docs/no-template-class-selector.md)
