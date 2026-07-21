@@ -17,7 +17,11 @@ const noClassDotSelector = {
         const arg = node.arguments?.[0];
         if (!arg) return;
 
-        if (arg.type === "Literal" && regex.test(arg.value)) {
+        if (
+          arg.type === "Literal" &&
+          typeof arg.value === "string" &&
+          regex.test(arg.value)
+        ) {
           context.report({
             node: arg,
             message: "Do not use .class selectors in locator()",

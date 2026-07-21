@@ -1,8 +1,3 @@
-// Todo: doesn't seem to match these cases:
-//   await page.locator('[data-testid="search-result"] h3 a').click()
-//   await page.locator('[data-testid="search-result"]').click()
-//   await page.locator('[data-testid=search-result]').click()
-
 const noDataTestIdSelector = {
   meta: {
     type: "problem",
@@ -20,7 +15,7 @@ const noDataTestIdSelector = {
       return node.quasis.map((q) => q.value.cooked || "").join("");
     }
 
-    function check(value, node, context) {
+    function check(value, node) {
       if (typeof value !== "string") return;
 
       if (TESTID_REGEX.test(value)) {
@@ -40,11 +35,11 @@ const noDataTestIdSelector = {
         if (!arg) return;
 
         if (arg.type === "Literal") {
-          check(arg.value, arg, context);
+          check(arg.value, arg);
         }
 
         if (arg.type === "TemplateLiteral") {
-          check(extractTemplateStatic(arg), arg, context);
+          check(extractTemplateStatic(arg), arg);
         }
       },
     };
