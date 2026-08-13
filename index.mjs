@@ -5,6 +5,7 @@ import noClassSelectorVariableFlow from "./rules/noClassSelectorVariableFlow.mjs
 import noDataSelector from "./rules/noDataSelector.mjs";
 import noDataTestIdSelector from "./rules/noDataTestIdSelector.mjs";
 import noIdSelector from "./rules/noIdSelector.mjs";
+import noNameAttributeSelector from "./rules/noNameAttributeSelector.mjs";
 import noTemplateClassSelector from "./rules/noTemplateClassSelector.mjs";
 import noXpathSelector from "./rules/noXpathSelector.mjs";
 
@@ -26,6 +27,7 @@ const playwrightPolicy = {
     "no-data-selector": noDataSelector,
     "no-data-test-id-selector": noDataTestIdSelector,
     "no-id-selector": noIdSelector,
+    "no-name-attribute-selector": noNameAttributeSelector,
     "no-template-class-selector": noTemplateClassSelector,
     "no-xpath-selector": noXpathSelector,
   },
@@ -45,6 +47,7 @@ Object.assign(playwrightPolicy.configs, {
         "playwright-policy/no-data-selector": ["warn"],
         "playwright-policy/no-data-test-id-selector": ["warn"],
         "playwright-policy/no-id-selector": ["warn"],
+        "playwright-policy/no-name-attribute-selector": ["warn"],
         "playwright-policy/no-template-class-selector": ["warn"],
         "playwright-policy/no-xpath-selector": ["warn"],
       },

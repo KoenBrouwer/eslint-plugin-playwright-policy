@@ -532,6 +532,23 @@ test("comprehensive class selector examples - all bad practices", async ({
 
   // ❌ BAD: Other framework-generated *-selector attributes
   await page.locator('[data-qa-selector="submit-button"]').click();
+
+  // ========================================
+  // 13. PARTIAL-MATCH NAME ATTRIBUTE SELECTORS
+  // ========================================
+
+  // ❌ BAD: Substring match on a generated array-style field name
+  const container = page.locator("form");
+  const select = container.locator(
+    'select[name*="[field_taxonomy_filter]"]',
+  );
+  await select.selectOption("value");
+
+  // ❌ BAD: Prefix match on name
+  await page.locator('input[name^="field_"]').fill("value");
+
+  // ❌ BAD: Suffix match on name
+  await page.locator('input[name$="_taxonomy_filter]"]').fill("value");
 });
 
 test("GOOD practices - recommended approaches", async ({ page }) => {
@@ -646,4 +663,19 @@ test("GOOD practices - recommended approaches", async ({ page }) => {
 
   // ✅ GOOD: Use getByTestId instead of [data-qa-selector="..."]
   await page.getByTestId("submit-button").click();
+
+  // ========================================
+  // ✅ GOOD: Instead of partial-match name attribute selectors
+  // ========================================
+
+  // ✅ GOOD: Use getByRole instead of select[name*="[field_taxonomy_filter]"]
+  await page
+    .getByRole("combobox", { name: "Taxonomy filter" })
+    .selectOption("value");
+
+  // ✅ GOOD: Use getByLabel instead of input[name^="field_"]
+  await page.getByLabel("Taxonomy filter").selectOption("value");
+
+  // ✅ GOOD: Exact-match name selectors are still fine
+  await page.locator('input[name="username"]').fill("alice");
 });

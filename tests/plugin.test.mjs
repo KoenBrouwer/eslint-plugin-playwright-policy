@@ -92,6 +92,11 @@ const cases = [
     good: "page.locator('button')",
   },
   {
+    rule: "no-name-attribute-selector",
+    bad: "container.locator('select[name*=\"[field_taxonomy_filter]\"]')",
+    good: "page.getByRole('combobox', { name: 'Taxonomy filter' })",
+  },
+  {
     rule: "no-template-class-selector",
     bad: "const size = 'lg'; page.locator(`.button-${size}`)",
     good: "const kind = 'primary'; page.locator(`button-${kind}`)",
