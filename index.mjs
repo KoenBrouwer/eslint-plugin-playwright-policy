@@ -5,6 +5,7 @@ import noClassSelectorVariableFlow from "./rules/noClassSelectorVariableFlow.mjs
 import noDataTestIdSelector from "./rules/noDataTestIdSelector.mjs";
 import noIdSelector from "./rules/noIdSelector.mjs";
 import noTemplateClassSelector from "./rules/noTemplateClassSelector.mjs";
+import noXpathSelector from "./rules/noXpathSelector.mjs";
 
 const pkg = JSON.parse(
   fs.readFileSync(new URL("./package.json", import.meta.url), "utf8"),
@@ -24,6 +25,7 @@ const playwrightPolicy = {
     "no-data-test-id-selector": noDataTestIdSelector,
     "no-id-selector": noIdSelector,
     "no-template-class-selector": noTemplateClassSelector,
+    "no-xpath-selector": noXpathSelector,
   },
 };
 
@@ -41,6 +43,7 @@ Object.assign(playwrightPolicy.configs, {
         "playwright-policy/no-data-test-id-selector": ["warn"],
         "playwright-policy/no-id-selector": ["warn"],
         "playwright-policy/no-template-class-selector": ["warn"],
+        "playwright-policy/no-xpath-selector": ["warn"],
       },
     },
   ],
