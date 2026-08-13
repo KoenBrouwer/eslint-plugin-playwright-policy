@@ -77,6 +77,11 @@ const cases = [
     good: "const selector = 'button'; page.locator(selector)",
   },
   {
+    rule: "no-data-selector",
+    bad: "page.locator('[data-drupal-selector=\"edit-field-example\"]')",
+    good: "page.getByLabel('Example field')",
+  },
+  {
     rule: "no-data-test-id-selector",
     bad: "page.locator('[data-testid=\"search-result\"]')",
     good: "page.getByTestId('search-result')",

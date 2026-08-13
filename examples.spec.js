@@ -517,6 +517,21 @@ test("comprehensive class selector examples - all bad practices", async ({
   // ❌ BAD: XPath with variable
   const fieldName = "email";
   await page.locator(`//input[@name="${fieldName}"]`).fill("test@example.com");
+
+  // ========================================
+  // 12. FRAMEWORK-GENERATED DATA SELECTORS
+  // ========================================
+
+  // ❌ BAD: Drupal's auto-generated data-drupal-selector
+  await page
+    .locator('[data-drupal-selector="edit-field-taxonomy-filter"]')
+    .selectOption("value");
+
+  // ❌ BAD: data-drupal-selector with substring match
+  const paragraph = page.locator('[data-drupal-selector$="-subform"]').last();
+
+  // ❌ BAD: Other framework-generated *-selector attributes
+  await page.locator('[data-qa-selector="submit-button"]').click();
 });
 
 test("GOOD practices - recommended approaches", async ({ page }) => {
@@ -619,4 +634,16 @@ test("GOOD practices - recommended approaches", async ({ page }) => {
 
   // ✅ GOOD: Use getByText instead of //div[text()="..."]
   await page.getByText("Forgot password?").click();
+
+  // ========================================
+  // ✅ GOOD: Instead of framework-generated data selectors
+  // ========================================
+
+  // ✅ GOOD: Use getByRole instead of [data-drupal-selector*="..."]
+  await page
+    .getByRole("combobox", { name: "Taxonomy filter" })
+    .selectOption("value");
+
+  // ✅ GOOD: Use getByTestId instead of [data-qa-selector="..."]
+  await page.getByTestId("submit-button").click();
 });
