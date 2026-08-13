@@ -91,6 +91,11 @@ const cases = [
     bad: "const size = 'lg'; page.locator(`.button-${size}`)",
     good: "const kind = 'primary'; page.locator(`button-${kind}`)",
   },
+  {
+    rule: "no-xpath-selector",
+    bad: "page.locator('//div[@class=\"login\"]')",
+    good: "page.getByRole('button', { name: 'Login' })",
+  },
 ];
 
 for (const ruleCase of cases) {

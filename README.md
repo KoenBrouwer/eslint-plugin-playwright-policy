@@ -33,6 +33,7 @@ export default [
 - [`playwright-policy/no-data-test-id-selector`](docs/no-data-test-id-selector.md)
 - [`playwright-policy/no-id-selector`](docs/no-id-selector.md)
 - [`playwright-policy/no-template-class-selector`](docs/no-template-class-selector.md)
+- [`playwright-policy/no-xpath-selector`](docs/no-xpath-selector.md)
 
 ## Contributing
 

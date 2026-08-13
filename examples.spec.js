@@ -497,6 +497,26 @@ test("comprehensive class selector examples - all bad practices", async ({
   await page.locator('[class*="rvo-footer__menu rvo-footer__"] li').count();
   await page.locator("[class*=Messages_o-messages_]").isVisible();
   await page.locator(".rvo-alert").textContent();
+
+  // ========================================
+  // 11. XPATH SELECTORS
+  // ========================================
+
+  // ❌ BAD: Relative XPath
+  await page.locator('//div[@class="login"]').click();
+
+  // ❌ BAD: Explicit xpath= prefix
+  await page.locator('xpath=//button[text()="Submit"]').click();
+
+  // ❌ BAD: Absolute XPath from document root
+  await page.locator("/html/body/div/main/button").click();
+
+  // ❌ BAD: XPath in template literal
+  await page.locator(`//input[@name="email"]`).fill("test@example.com");
+
+  // ❌ BAD: XPath with variable
+  const fieldName = "email";
+  await page.locator(`//input[@name="${fieldName}"]`).fill("test@example.com");
 });
 
 test("GOOD practices - recommended approaches", async ({ page }) => {
@@ -586,4 +606,17 @@ test("GOOD practices - recommended approaches", async ({ page }) => {
     .filter({ hasText: "Active" })
     .getByRole("button")
     .click();
+
+  // ========================================
+  // ✅ GOOD: Instead of XPath
+  // ========================================
+
+  // ✅ GOOD: Use getByRole instead of //button[text()="..."]
+  await page.getByRole("button", { name: "Log in" }).click();
+
+  // ✅ GOOD: Use getByLabel instead of //input[@name="username"]
+  await page.getByLabel("Username").fill("alice");
+
+  // ✅ GOOD: Use getByText instead of //div[text()="..."]
+  await page.getByText("Forgot password?").click();
 });
