@@ -2,7 +2,7 @@
 title: no-name-attribute-selector
 rule_type: problem
 related_rules:
-- no-data-selector
+- no-data-attribute-selector
 further_reading:
 - https://playwright.dev/docs/locators
 ---

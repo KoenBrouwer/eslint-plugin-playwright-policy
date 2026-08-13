@@ -3,7 +3,7 @@ title: no-xpath-selector
 rule_type: problem
 related_rules:
 - no-id-selector
-- no-data-test-id-selector
+- no-data-attribute-selector
 further_reading:
 - https://playwright.dev/docs/locators
 ---

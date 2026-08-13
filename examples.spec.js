@@ -79,15 +79,7 @@ test("comprehensive selector examples - all bad practices", async ({
   await page.locator(`form #${fieldId}`).fill("alice@example.com");
 
   // ========================================
-  // 6. no-data-test-id-selector
-  // ========================================
-
-  // ❌ BAD: [data-testid=...] used directly as a CSS selector
-  await page.locator('[data-testid="search-result"]').click();
-  await page.locator(`[data-testid="${fieldId}"] a`).click();
-
-  // ========================================
-  // 7. no-xpath-selector
+  // 6. no-xpath-selector
   // ========================================
 
   // ❌ BAD: Relative XPath
@@ -107,8 +99,12 @@ test("comprehensive selector examples - all bad practices", async ({
   await page.locator(`//input[@name="${fieldName}"]`).fill("test@example.com");
 
   // ========================================
-  // 8. no-data-selector
+  // 7. no-data-attribute-selector
   // ========================================
+
+  // ❌ BAD: [data-testid=...] used directly as a CSS selector
+  await page.locator('[data-testid="search-result"]').click();
+  await page.locator(`[data-testid="${fieldId}"] a`).click();
 
   // ❌ BAD: Drupal's auto-generated data-drupal-selector
   await page
@@ -121,8 +117,11 @@ test("comprehensive selector examples - all bad practices", async ({
   // ❌ BAD: Other framework-generated *-selector attributes
   await page.locator('[data-qa-selector="submit-button"]').click();
 
+  // ❌ BAD: Ad-hoc test hook attribute (not just *-selector attributes)
+  await page.locator('[data-cy="submit-button"]').click();
+
   // ========================================
-  // 9. no-name-attribute-selector
+  // 8. no-name-attribute-selector
   // ========================================
 
   // ❌ BAD: Substring match on a generated array-style field name
@@ -181,14 +180,7 @@ test("GOOD practices - recommended approaches", async ({ page }) => {
   await page.getByLabel("Email").fill("alice@example.com");
 
   // ========================================
-  // 6. no-data-test-id-selector
-  // ========================================
-
-  // ✅ GOOD: Use getByTestId instead of [data-testid=...]
-  await page.getByTestId("search-result").click();
-
-  // ========================================
-  // 7. no-xpath-selector
+  // 6. no-xpath-selector
   // ========================================
 
   // ✅ GOOD: Use getByRole instead of //button[text()="..."]
@@ -201,19 +193,22 @@ test("GOOD practices - recommended approaches", async ({ page }) => {
   await page.getByText("Forgot password?").click();
 
   // ========================================
-  // 8. no-data-selector
+  // 7. no-data-attribute-selector
   // ========================================
+
+  // ✅ GOOD: Use getByTestId instead of [data-testid=...]
+  await page.getByTestId("search-result").click();
 
   // ✅ GOOD: Use getByRole instead of [data-drupal-selector*="..."]
   await page
     .getByRole("combobox", { name: "Taxonomy filter" })
     .selectOption("value");
 
-  // ✅ GOOD: Use getByTestId instead of [data-qa-selector="..."]
+  // ✅ GOOD: Use getByTestId instead of [data-qa-selector="..."] / [data-cy="..."]
   await page.getByTestId("submit-button").click();
 
   // ========================================
-  // 9. no-name-attribute-selector
+  // 8. no-name-attribute-selector
   // ========================================
 
   // ✅ GOOD: Use getByRole instead of select[name*="[field_taxonomy_filter]"]

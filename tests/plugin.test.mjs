@@ -33,6 +33,23 @@ function singleRuleConfig(ruleName) {
   ];
 }
 
+function singleRuleConfigWithOptions(ruleName, options) {
+  return [
+    {
+      languageOptions: {
+        ecmaVersion: "latest",
+        sourceType: "module",
+      },
+      plugins: {
+        "playwright-policy": playwrightPolicy,
+      },
+      rules: {
+        [`playwright-policy/${ruleName}`]: ["error", options],
+      },
+    },
+  ];
+}
+
 function flatRecommendedConfig() {
   return [
     {
@@ -111,19 +128,24 @@ const cases = [
     good: "const selector = 'button'; page.locator(selector)",
   },
   {
-    rule: "no-data-selector",
+    rule: "no-data-attribute-selector",
     bad: "page.locator('[data-drupal-selector=\"edit-field-example\"]')",
     good: "page.getByLabel('Example field')",
   },
   {
-    rule: "no-data-test-id-selector",
+    rule: "no-data-attribute-selector",
     bad: "page.locator('[data-testid=\"search-result\"]')",
     good: "page.getByTestId('search-result')",
   },
   {
-    rule: "no-data-test-id-selector",
+    rule: "no-data-attribute-selector",
     bad: "page.locator('[data-testid=\"search-result\"] h3 a').click()",
     good: "page.getByTestId('search-result').getByRole('link').click()",
+  },
+  {
+    rule: "no-data-attribute-selector",
+    bad: "page.locator('[data-cy=\"submit-button\"]')",
+    good: "page.getByRole('button', { name: 'Submit' })",
   },
   {
     rule: "no-id-selector",
@@ -174,6 +196,63 @@ for (const ruleCase of cases) {
     assert.equal(messages.length, 0);
   });
 }
+
+test("no-data-attribute-selector allow option exempts listed attribute names", async () => {
+  const messages = await lintText(
+    singleRuleConfigWithOptions("no-data-attribute-selector", {
+      allow: ["data-testid"],
+    }),
+    "page.locator('[data-testid=\"search-result\"]')",
+  );
+
+  assert.equal(messages.length, 0);
+});
+
+test("no-data-attribute-selector allow option is case-insensitive", async () => {
+  const messages = await lintText(
+    singleRuleConfigWithOptions("no-data-attribute-selector", {
+      allow: ["Data-TestId"],
+    }),
+    "page.locator('[data-testid=\"search-result\"]')",
+  );
+
+  assert.equal(messages.length, 0);
+});
+
+test("no-data-attribute-selector allow option doesn't exempt other data-* attributes", async () => {
+  const messages = await lintText(
+    singleRuleConfigWithOptions("no-data-attribute-selector", {
+      allow: ["data-testid"],
+    }),
+    "page.locator('[data-drupal-selector=\"edit-field-example\"]')",
+  );
+
+  assert.ok(messages.length > 0);
+  assert.ok(
+    messages.some(
+      (m) => m.ruleId === "playwright-policy/no-data-attribute-selector",
+    ),
+  );
+});
+
+test("no-data-attribute-selector allow option: allowed attribute passes, non-allowed attribute in the same file is still blocked", async () => {
+  const messages = await lintText(
+    singleRuleConfigWithOptions("no-data-attribute-selector", {
+      allow: ["data-testid"],
+    }),
+    [
+      "page.locator('[data-testid=\"search-result\"]').click();",
+      "page.locator('[data-cy=\"submit-button\"]').click();",
+    ].join("\n"),
+  );
+
+  assert.equal(messages.length, 1);
+  assert.equal(
+    messages[0].ruleId,
+    "playwright-policy/no-data-attribute-selector",
+  );
+  assert.match(messages[0].message, /data-cy/);
+});
 
 // GOOD examples from examples.spec.js's "GOOD practices" test, linted
 // against the full flat/recommended config rather than a single rule — a
