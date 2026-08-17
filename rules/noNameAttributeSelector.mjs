@@ -1,16 +1,21 @@
-const noDataTestIdSelector = {
+// Matches [name*=...], [name^=...], [name$=...] attribute selectors.
+// Exact-match [name=...] is intentionally allowed: it's a stable selector
+// on a plain HTML attribute. Partial-match operators are the brittle case,
+// e.g. matching Drupal's generated array-style field names.
+const NAME_ATTR_REGEX =
+  /\[\s*name\s*[~^$*]=\s*(?:(['"])(?:\\.|(?!\1).)*\1|[^\]\s]+)\s*\]/i;
+
+const noNameAttributeSelector = {
   meta: {
     type: "problem",
     schema: [],
     docs: {
       description:
-        "Disallow [data-testid=] CSS selectors in locator(). Use getByTestId().",
+        "Disallow [name*=...] / [name^=...] / [name$=...] partial-match attribute selectors in Playwright locator().",
     },
   },
 
   create(context) {
-    const TESTID_REGEX = /\[\s*data-testid\s*=[^\]]+\]/i;
-
     function extractTemplateStatic(node) {
       return node.quasis.map((q) => q.value.cooked || "").join("");
     }
@@ -18,11 +23,11 @@ const noDataTestIdSelector = {
     function check(value, node) {
       if (typeof value !== "string") return;
 
-      if (TESTID_REGEX.test(value)) {
+      if (NAME_ATTR_REGEX.test(value)) {
         context.report({
           node,
           message:
-            "Using test ids is not recommended. Please use accessibility selectors instead.",
+            "Do not use partial-match [name] attribute selectors in locator(). Use getByRole / getByLabel instead.",
         });
       }
     }
@@ -46,4 +51,4 @@ const noDataTestIdSelector = {
   },
 };
 
-export default noDataTestIdSelector;
+export default noNameAttributeSelector;

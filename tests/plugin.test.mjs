@@ -33,6 +33,35 @@ function singleRuleConfig(ruleName) {
   ];
 }
 
+function singleRuleConfigWithOptions(ruleName, options) {
+  return [
+    {
+      languageOptions: {
+        ecmaVersion: "latest",
+        sourceType: "module",
+      },
+      plugins: {
+        "playwright-policy": playwrightPolicy,
+      },
+      rules: {
+        [`playwright-policy/${ruleName}`]: ["error", options],
+      },
+    },
+  ];
+}
+
+function flatRecommendedConfig() {
+  return [
+    {
+      languageOptions: {
+        ecmaVersion: "latest",
+        sourceType: "module",
+      },
+    },
+    ...playwrightPolicy.configs["flat/recommended"],
+  ];
+}
+
 test("root package import resolves and exposes flat config", async () => {
   const mod = await import("eslint-plugin-playwright-policy");
 
@@ -42,15 +71,7 @@ test("root package import resolves and exposes flat config", async () => {
 
 test("flat/recommended can be consumed and reports namespaced rule IDs", async () => {
   const messages = await lintText(
-    [
-      {
-        languageOptions: {
-          ecmaVersion: "latest",
-          sourceType: "module",
-        },
-      },
-      ...playwrightPolicy.configs["flat/recommended"],
-    ],
+    flatRecommendedConfig(),
     "page.locator('#login-button')",
   );
 
@@ -72,19 +93,74 @@ const cases = [
     good: "page.locator('button')",
   },
   {
+    rule: "no-class-dot-selector",
+    bad: "expect(page.locator('.error-message')).toBeVisible()",
+    good: "expect(page.getByRole('alert')).toBeVisible()",
+  },
+  {
+    rule: "no-class-dot-selector",
+    bad: "page.locator('.card:has-text(\"Active\")').click()",
+    good: "page.getByText('Active').click()",
+  },
+  {
+    rule: "no-class-dot-selector",
+    bad: "page.locator('.button').or(page.locator('.link')).click()",
+    good: "page.getByRole('button').or(page.getByRole('link')).click()",
+  },
+  {
+    rule: "no-class-dot-selector",
+    bad: "page.frameLocator('.iframe-container').locator('.inner-button').click()",
+    good: "page.frameLocator('iframe').getByRole('button').click()",
+  },
+  {
+    rule: "no-class-dot-selector",
+    bad: "page.locator('.block__element--modifier').click()",
+    good: "page.getByTestId('block-element').click()",
+  },
+  {
+    rule: "no-class-attribute-selector",
+    bad: "page.locator('[class^=\"MuiButton-\"]').click()",
+    good: "page.getByRole('button', { name: 'Continue' }).click()",
+  },
+  {
     rule: "no-class-selector-variable-flow",
     bad: "const selector = '.cta-button'; page.locator(selector)",
     good: "const selector = 'button'; page.locator(selector)",
   },
   {
-    rule: "no-data-test-id-selector",
+    rule: "no-data-attribute-selector",
+    bad: "page.locator('[data-drupal-selector=\"edit-field-example\"]')",
+    good: "page.getByLabel('Example field')",
+  },
+  {
+    rule: "no-data-attribute-selector",
     bad: "page.locator('[data-testid=\"search-result\"]')",
     good: "page.getByTestId('search-result')",
+  },
+  {
+    rule: "no-data-attribute-selector",
+    bad: "page.locator('[data-testid=\"search-result\"] h3 a').click()",
+    good: "page.getByTestId('search-result').getByRole('link').click()",
+  },
+  {
+    rule: "no-data-attribute-selector",
+    bad: "page.locator('[data-cy=\"submit-button\"]')",
+    good: "page.getByRole('button', { name: 'Submit' })",
   },
   {
     rule: "no-id-selector",
     bad: "page.locator('#search-button')",
     good: "page.locator('button')",
+  },
+  {
+    rule: "no-id-selector",
+    bad: "page.locator('#rvo-autocomplete-listbox').isVisible()",
+    good: "page.getByRole('listbox').isVisible()",
+  },
+  {
+    rule: "no-name-attribute-selector",
+    bad: "container.locator('select[name*=\"[field_taxonomy_filter]\"]')",
+    good: "page.getByRole('combobox', { name: 'Taxonomy filter' })",
   },
   {
     rule: "no-template-class-selector",
@@ -118,5 +194,97 @@ for (const ruleCase of cases) {
     );
 
     assert.equal(messages.length, 0);
+  });
+}
+
+test("no-data-attribute-selector allow option exempts listed attribute names", async () => {
+  const messages = await lintText(
+    singleRuleConfigWithOptions("no-data-attribute-selector", {
+      allow: ["data-testid"],
+    }),
+    "page.locator('[data-testid=\"search-result\"]')",
+  );
+
+  assert.equal(messages.length, 0);
+});
+
+test("no-data-attribute-selector allow option is case-insensitive", async () => {
+  const messages = await lintText(
+    singleRuleConfigWithOptions("no-data-attribute-selector", {
+      allow: ["Data-TestId"],
+    }),
+    "page.locator('[data-testid=\"search-result\"]')",
+  );
+
+  assert.equal(messages.length, 0);
+});
+
+test("no-data-attribute-selector allow option doesn't exempt other data-* attributes", async () => {
+  const messages = await lintText(
+    singleRuleConfigWithOptions("no-data-attribute-selector", {
+      allow: ["data-testid"],
+    }),
+    "page.locator('[data-drupal-selector=\"edit-field-example\"]')",
+  );
+
+  assert.ok(messages.length > 0);
+  assert.ok(
+    messages.some(
+      (m) => m.ruleId === "playwright-policy/no-data-attribute-selector",
+    ),
+  );
+});
+
+test("no-data-attribute-selector allow option: allowed attribute passes, non-allowed attribute in the same file is still blocked", async () => {
+  const messages = await lintText(
+    singleRuleConfigWithOptions("no-data-attribute-selector", {
+      allow: ["data-testid"],
+    }),
+    [
+      "page.locator('[data-testid=\"search-result\"]').click();",
+      "page.locator('[data-cy=\"submit-button\"]').click();",
+    ].join("\n"),
+  );
+
+  assert.equal(messages.length, 1);
+  assert.equal(
+    messages[0].ruleId,
+    "playwright-policy/no-data-attribute-selector",
+  );
+  assert.match(messages[0].message, /data-cy/);
+});
+
+// GOOD examples from examples.spec.js's "GOOD practices" test, linted
+// against the full flat/recommended config rather than a single rule — a
+// good example must not violate ANY rule, not just the one it's meant to
+// demonstrate avoiding. This is what would have caught the bug where
+// examples.spec.js listed ID selectors as GOOD despite no-id-selector
+// flagging them.
+const goodExamples = [
+  'page.getByRole("navigation").click()',
+  'page.getByRole("button", { name: "Continue" }).click()',
+  'page.getByRole("button", { name: "Submit" }).click()',
+  'page.getByTestId("intro").isVisible()',
+  'const kind = "primary"; page.locator(`button-${kind}`).click()',
+  'const goodSelector = "button"; page.locator(goodSelector).click()',
+  'page.getByRole("button", { name: "Log in" }).click()',
+  'page.getByLabel("Email").fill("alice@example.com")',
+  'page.getByTestId("search-result").click()',
+  'page.getByLabel("Username").fill("alice")',
+  'page.getByText("Forgot password?").click()',
+  'page.getByRole("combobox", { name: "Taxonomy filter" }).selectOption("value")',
+  'page.getByTestId("submit-button").click()',
+  'page.getByLabel("Taxonomy filter").selectOption("value")',
+  'page.locator(\'input[name="username"]\').fill("alice")',
+];
+
+for (const [index, code] of goodExamples.entries()) {
+  test(`good example #${index + 1} triggers no playwright-policy warnings: "${code}"`, async () => {
+    const messages = await lintText(flatRecommendedConfig(), code);
+
+    const policyMessages = messages.filter((m) =>
+      m.ruleId?.startsWith("playwright-policy/"),
+    );
+    assert.deepEqual(policyMessages, []);
   });
 }
